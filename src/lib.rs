@@ -37,6 +37,8 @@ fn print_link_args(dst: &Path, project_name: &str) {
     // get linker args from build.ninja
     let contents = read_link_line(dst, project_name);
 
+    println!("cargo:rustc-link-lib={project_name}-c");
+
     println!("cargo:rustc-link-search=native={}/build", dst.display());
 
     let mut search_paths = Vec::new();
@@ -87,7 +89,7 @@ fn read_link_line(dst: &Path, project_name: &str) -> String {
     // this could very well be the world's worst parser
     let index = contents
         .find(&format!(
-            "build {}-link-libraries.txt: ECHO_EXECUTABLE_LINKER",
+            "build lib{}-c.a:",
             project_name
         ))
         .unwrap_or_else(|| panic!("could not find echo target in {}", build_ninja));
@@ -99,7 +101,7 @@ fn read_link_line(dst: &Path, project_name: &str) -> String {
 
     let contents = &contents[index+2..];
 
-    let end = contents.find("||").unwrap_or_else(||panic!("could not find end of linker args in {}", build_ninja));
+    let end = contents.find('\n').unwrap_or_else(||panic!("could not find end of linker args in {}", build_ninja));
     // on windows drive letters are encoded as C$:\
     let contents = contents[..end].replace("$:", ":");
 
