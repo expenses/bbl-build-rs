@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[cfg(target_os = "linux")]
+#[cfg(not(target_os = "windows"))]
 use regex::Regex;
 
 #[cfg(target_os = "windows")]
@@ -32,7 +32,7 @@ fn print_link_args(dst: &Path, project_name: &str) {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(not(target_os = "windows"))]
 fn print_link_args(dst: &Path, project_name: &str) {
     // get linker args from build.ninja
     let contents = read_link_line(dst, project_name);
